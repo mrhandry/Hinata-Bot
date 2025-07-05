@@ -2,7 +2,7 @@ const os = require("os");
 
 module.exports = {
   config: {
-    name: "up2",
+    name: "up",
     version: "4.0-up7",
     author: "Amit Max | Mod by Xrotick",
     role: 0,
@@ -47,7 +47,7 @@ module.exports = {
       const [date, time] = now.split(", ");
 
       const finalMessage = `
-Bot Uptime Info
+HiNaTa Uptime Info...
 
 Uptime : ${uptimeFormatted}
 Time   : ${time}
