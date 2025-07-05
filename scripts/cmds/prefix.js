@@ -1,7 +1,7 @@
 module.exports = {
   config: {
     name: "prefix",
-    version: "1.0",
+    version: "1.2",
     author: "Arafat Hassan",
     countDown: 3,
     role: 0,
@@ -16,6 +16,7 @@ module.exports = {
     if (event.body && event.body.toLowerCase() === "prefix") {
       const globalPrefix = global.GoatBot.config.prefix;
       return message.reply(
+        `Hinata/Hena\n` +
         `Grobal Prefix: ${globalPrefix}\n` +
         `Admin: Arafat Hassan`
       );
