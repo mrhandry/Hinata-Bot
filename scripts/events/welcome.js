@@ -6,7 +6,7 @@ if (!global.temp.welcomeEvent)
 module.exports = {
   config: {
     name: "welcome",
-    version: "2.0",
+    version: "2.2",
     author: "Modified by Arafat",
     category: "events"
   },
@@ -17,7 +17,7 @@ module.exports = {
     const { threadID } = event;
     const addedParticipants = event.logMessageData.addedParticipants;
 
-    // Bot added to group
+    // Bot added
     if (addedParticipants.some(user => user.userFbId === api.getCurrentUserID())) {
       const prefix = global.utils.getPrefix(threadID);
       return message.send(
@@ -40,29 +40,48 @@ module.exports = {
 
       const participants = global.temp.welcomeEvent[threadID].dataAddedParticipants;
       const dataBanned = threadData?.data?.banned_ban || [];
+      const threadName = threadData?.threadName || "this group";
+
+      const validUsers = [];
 
       for (const user of participants) {
         if (dataBanned.some(b => b.id === user.userFbId)) continue;
-
-        const name = user.fullName;
-        const mention = [{ tag: name, id: user.userFbId }];
-        let genderText = "him/her";
-
-        try {
-          const userInfo = await api.getUserInfo(user.userFbId);
-          const gender = userInfo[user.userFbId]?.gender;
-          if (gender === 1) genderText = "her";
-          else if (gender === 2) genderText = "him";
-        } catch (err) {
-          console.error("Gender fetch failed:", err.message);
-        }
-
-        const msg = `@everyone ${name} is a new member of our group, everyone please welcome ${genderText}.`;
-
-        await message.send({ body: msg, mentions: mention });
+        validUsers.push(user);
       }
 
+      if (validUsers.length === 0) return;
+
+      // Multiple users
+      if (validUsers.length > 1) {
+        const mentions = validUsers.map(user => ({
+          tag: user.fullName,
+          id: user.userFbId
+        }));
+
+        const msg = `Welcome everyone to the ${threadName} Group! Let's all be friendly with each other!`;
+
+        return message.send({ body: msg, mentions });
+      }
+
+      // Single user
+      const user = validUsers[0];
+      const name = user.fullName;
+      const mention = [{ tag: name, id: user.userFbId }];
+      let genderText = "him/her";
+
+      try {
+        const userInfo = await api.getUserInfo(user.userFbId);
+        const gender = userInfo[user.userFbId]?.gender;
+        if (gender === 1) genderText = "her";
+        else if (gender === 2) genderText = "him";
+      } catch (err) {
+        console.error("Gender fetch failed:", err.message);
+      }
+
+      const msg = `${name} is a new member of ${threadName}. Everyone, please welcome ${genderText}.`;
+
+      await message.send({ body: msg, mentions: mention });
       delete global.temp.welcomeEvent[threadID];
-    }, 1500);
+    }, 1000);
   }
 };
